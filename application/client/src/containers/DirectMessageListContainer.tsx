@@ -12,6 +12,10 @@ interface Props {
 export const DirectMessageListContainer = ({ activeUser, authModalId }: Props) => {
   const newDmModalId = useId();
 
+  useEffect(() => {
+    document.title = "ダイレクトメッセージ - CaX";
+  }, []);
+
   if (activeUser === null) {
     return (
       <DirectMessageGate
@@ -20,10 +24,6 @@ export const DirectMessageListContainer = ({ activeUser, authModalId }: Props) =
       />
     );
   }
-
-  useEffect(() => {
-    document.title = "ダイレクトメッセージ - CaX";
-  }, []);
 
   return (
     <>
