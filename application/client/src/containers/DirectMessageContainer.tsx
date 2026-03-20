@@ -102,6 +102,19 @@ export const DirectMessageContainer = ({ activeUser, authModalId }: Props) => {
     }
   });
 
+  const peer =
+    conversation != null && activeUser != null
+      ? conversation.initiator.id !== activeUser.id
+        ? conversation.initiator
+        : conversation.member
+      : null;
+
+  useEffect(() => {
+    if (peer != null) {
+      document.title = `${peer.name} さんとのダイレクトメッセージ - CaX`;
+    }
+  }, [peer?.name]);
+
   if (activeUser === null) {
     return (
       <DirectMessageGate
@@ -117,13 +130,6 @@ export const DirectMessageContainer = ({ activeUser, authModalId }: Props) => {
     }
     return null;
   }
-
-  const peer =
-    conversation.initiator.id !== activeUser?.id ? conversation.initiator : conversation.member;
-
-  useEffect(() => {
-    document.title = `${peer.name} さんとのダイレクトメッセージ - CaX`;
-  }, [peer.name]);
 
   return (
     <>
