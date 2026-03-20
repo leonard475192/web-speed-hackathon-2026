@@ -87,10 +87,10 @@ jobs:
           key: playwright-${{ steps.playwright-version.outputs.version }}
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: cd application && pnpm --filter @web-speed-hackathon-2026/e2e exec playwright install --with-deps chromium
+        run: cd application && pnpm --filter @web-speed-hackathon-2026/e2e exec playwright install --with-deps chrome
       - name: Install Playwright deps (cached)
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: cd application && pnpm --filter @web-speed-hackathon-2026/e2e exec playwright install-deps chromium
+        run: cd application && pnpm --filter @web-speed-hackathon-2026/e2e exec playwright install-deps chrome
       - name: Start server and run E2E tests
         env:
           E2E_WORKERS: 2
