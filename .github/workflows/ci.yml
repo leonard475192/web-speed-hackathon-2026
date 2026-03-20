@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: pnpm
+          cache-dependency-path: application/pnpm-lock.yaml
+      - run: corepack enable
+      - run: cd application && pnpm install --frozen-lockfile
+      - run: cd application && npx oxlint .
+      - run: cd application && npx oxfmt --check .
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: pnpm
+          cache-dependency-path: application/pnpm-lock.yaml
+      - run: corepack enable
+      - run: cd application && pnpm install --frozen-lockfile
+      - run: cd application && pnpm run typecheck
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: pnpm
+          cache-dependency-path: application/pnpm-lock.yaml
+      - run: corepack enable
+      - run: cd application && pnpm install --frozen-lockfile
+      - run: cd application && pnpm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: client-dist
+          path: application/client/dist/
+          retention-days: 1
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: build
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24.14.0"
+          cache: pnpm
+          cache-dependency-path: application/pnpm-lock.yaml
+      - run: corepack enable
+      - run: cd application && pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        with:
+          name: client-dist
+          path: application/client/dist/
+      - run: cd application && pnpm --filter @web-speed-hackathon-2026/e2e exec playwright install --with-deps chromium
+      - name: Start server and run E2E tests
+        run: |
+          cd application && pnpm run start &
+          timeout 60 bash -c 'until curl -s http://localhost:3000 > /dev/null 2>&1; do sleep 2; done'
+          cd application/e2e && pnpm run test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-report
+          path: application/e2e/test-results/
+          retention-days: 7
