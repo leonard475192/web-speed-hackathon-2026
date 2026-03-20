@@ -30,5 +30,13 @@
   "engines": {
     "node": "24.14.0"
   },
-  "packageManager": "pnpm@10.32.1"
+  "packageManager": "pnpm@10.32.1",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt",
+      "iltorb",
+      "negaposi-analyzer-ja",
+      "sqlite3"
+    ]
+  }
 }
