@@ -16,7 +16,7 @@ export const UserProfileHeader = ({ user }: Props) => {
   /** @type {React.ReactEventHandler<HTMLImageElement>} */
   const handleLoadImage = useCallback<ReactEventHandler<HTMLImageElement>>((ev) => {
     const fac = new FastAverageColor();
-    const { rgb } = fac.getColor(ev.currentTarget, { mode: "precision" });
+    const { rgb } = fac.getColor(ev.currentTarget, { mode: "speed" });
     setAverageColor(rgb);
     fac.destroy();
   }, []);
@@ -29,7 +29,12 @@ export const UserProfileHeader = ({ user }: Props) => {
       <div className="border-cax-border bg-cax-surface-subtle absolute left-2/4 m-0 h-28 w-28 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border sm:h-32 sm:w-32">
         <img
           alt=""
+          className="h-full w-full object-cover"
           crossOrigin="anonymous"
+          loading="eager"
+          fetchPriority="high"
+          width={128}
+          height={128}
           onLoad={handleLoadImage}
           src={getProfileImagePath(user.profileImage.id)}
         />
