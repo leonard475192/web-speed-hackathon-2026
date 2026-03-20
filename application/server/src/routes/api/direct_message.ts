@@ -1,6 +1,6 @@
 import { Router } from "express";
 import httpErrors from "http-errors";
-import { col, Op } from "sequelize";
+import { Op } from "sequelize";
 
 import { eventhub } from "@web-speed-hackathon-2026/server/src/eventhub";
 import {
@@ -23,21 +23,25 @@ directMessageRouter.get("/dm", async (req, res) => {
       {
         association: "messages",
         include: [{ association: "sender", include: [{ association: "profileImage" }] }],
-        required: true,
+        separate: true,
+        order: [["createdAt", "DESC"]],
+        limit: 20,
       },
     ],
     where: {
       [Op.or]: [{ initiatorId: req.session.userId }, { memberId: req.session.userId }],
     },
-    order: [[col("messages.createdAt"), "DESC"]],
   });
 
-  const sorted = conversations.map((c) => ({
-    ...c.toJSON(),
-    messages: (c.messages ?? []).sort(
-      (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
-    ),
-  }));
+  // Filter out conversations with no messages and sort messages chronologically
+  const sorted = conversations
+    .filter((c) => (c.messages ?? []).length > 0)
+    .map((c) => ({
+      ...c.toJSON(),
+      messages: (c.messages ?? []).sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      ),
+    }));
 
   return res.status(200).type("application/json").send(sorted);
 });
