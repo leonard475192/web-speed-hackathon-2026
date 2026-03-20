@@ -1,5 +1,5 @@
 import classNames from "classnames";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { AspectRatioBox } from "@web-speed-hackathon-2026/client/src/components/foundation/AspectRatioBox";
 import { FontAwesomeIcon } from "@web-speed-hackathon-2026/client/src/components/foundation/FontAwesomeIcon";
@@ -13,6 +13,31 @@ interface Props {
  */
 export const PausableMovie = ({ src }: Props) => {
   const [isPlaying, setIsPlaying] = useState(true);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number>(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const img = new Image();
+    img.onload = () => {
+      canvas.width = img.naturalWidth;
+      canvas.height = img.naturalHeight;
+      const draw = () => {
+        ctx.drawImage(img, 0, 0);
+        animFrameRef.current = requestAnimationFrame(draw);
+      };
+      animFrameRef.current = requestAnimationFrame(draw);
+    };
+    img.src = src;
+
+    return () => {
+      cancelAnimationFrame(animFrameRef.current);
+    };
+  }, [src]);
 
   const handleClick = useCallback(() => {
     setIsPlaying((prev) => !prev);
@@ -26,7 +51,7 @@ export const PausableMovie = ({ src }: Props) => {
         onClick={handleClick}
         type="button"
       >
-        <img alt="" className="w-full" src={src} />
+        <canvas ref={canvasRef} className="w-full" />
         <div
           className={classNames(
             "absolute left-1/2 top-1/2 flex items-center justify-center w-16 h-16 text-cax-surface-raised text-3xl bg-cax-overlay/50 rounded-full -translate-x-1/2 -translate-y-1/2",
