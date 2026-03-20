@@ -1,3 +1,4 @@
+import { memo } from "react";
 // @ts-expect-error -- dynamic CSS import for code splitting; no type declarations needed
 void import("katex/dist/katex.min.css");
 import Markdown from "react-markdown";
@@ -8,6 +9,10 @@ import remarkMath from "remark-math";
 import { CodeBlock } from "@web-speed-hackathon-2026/client/src/components/crok/CodeBlock";
 import { TypingIndicator } from "@web-speed-hackathon-2026/client/src/components/crok/TypingIndicator";
 import { CrokLogo } from "@web-speed-hackathon-2026/client/src/components/foundation/CrokLogo";
+
+const markdownComponents = { pre: CodeBlock };
+const rehypePluginsList = [rehypeKatex];
+const remarkPluginsList = [remarkMath, remarkGfm];
 
 interface Props {
   message: Models.ChatMessage;
@@ -34,10 +39,10 @@ const AssistantMessage = ({ content }: { content: string }) => {
         <div className="markdown text-cax-text max-w-none">
           {content ? (
             <Markdown
-              components={{ pre: CodeBlock }}
+              components={markdownComponents}
               key={content}
-              rehypePlugins={[rehypeKatex]}
-              remarkPlugins={[remarkMath, remarkGfm]}
+              rehypePlugins={rehypePluginsList}
+              remarkPlugins={remarkPluginsList}
             >
               {content}
             </Markdown>
@@ -50,9 +55,9 @@ const AssistantMessage = ({ content }: { content: string }) => {
   );
 };
 
-export const ChatMessage = ({ message }: Props) => {
+export const ChatMessage = memo(function ChatMessage({ message }: Props) {
   if (message.role === "user") {
     return <UserMessage content={message.content} />;
   }
   return <AssistantMessage content={message.content} />;
-};
+});

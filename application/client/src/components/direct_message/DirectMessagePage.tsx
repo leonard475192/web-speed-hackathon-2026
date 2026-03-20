@@ -44,6 +44,7 @@ export const DirectMessagePage = ({
   const textAreaRows = Math.min((text || "").split("\n").length, 5);
   const isInvalid = text.trim().length === 0;
   const scrollHeightRef = useRef(0);
+  const messageListRef = useRef<HTMLDivElement>(null);
 
   const handleChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -84,10 +85,13 @@ export const DirectMessagePage = ({
 
     scrollToBottom();
 
+    const target = messageListRef.current;
+    if (!target) return;
+
     const observer = new MutationObserver(() => {
       scrollToBottom();
     });
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    observer.observe(target, { childList: true, subtree: true, characterData: true });
 
     return () => observer.disconnect();
   }, []);
@@ -118,7 +122,10 @@ export const DirectMessagePage = ({
         </div>
       </header>
 
-      <div className="bg-cax-surface-subtle flex-1 space-y-4 overflow-y-auto px-4 pt-4 pb-8">
+      <div
+        ref={messageListRef}
+        className="bg-cax-surface-subtle flex-1 space-y-4 overflow-y-auto px-4 pt-4 pb-8"
+      >
         {conversation.messages.length === 0 && (
           <p className="text-cax-text-muted text-center text-sm">
             まだメッセージはありません。最初のメッセージを送信してみましょう。
