@@ -1,4 +1,24 @@
-import { gzip } from "pako";
+async function compressGzip(data: Uint8Array): Promise<Uint8Array> {
+  const cs = new CompressionStream("gzip");
+  const writer = cs.writable.getWriter();
+  writer.write(data as unknown as BufferSource);
+  writer.close();
+  const reader = cs.readable.getReader();
+  const chunks: Uint8Array[] = [];
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    chunks.push(value);
+  }
+  const totalLength = chunks.reduce((acc, chunk) => acc + chunk.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  for (const chunk of chunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+  return result;
+}
 
 export async function fetchBinary(url: string): Promise<ArrayBuffer> {
   const response = await fetch(url);
@@ -31,7 +51,7 @@ export async function sendFile<T>(url: string, file: File): Promise<T> {
 export async function sendJSON<T>(url: string, data: object): Promise<T> {
   const jsonString = JSON.stringify(data);
   const uint8Array = new TextEncoder().encode(jsonString);
-  const compressed = gzip(uint8Array);
+  const compressed = await compressGzip(uint8Array);
 
   const response = await fetch(url, {
     method: "POST",
@@ -39,7 +59,7 @@ export async function sendJSON<T>(url: string, data: object): Promise<T> {
       "Content-Encoding": "gzip",
       "Content-Type": "application/json",
     },
-    body: compressed,
+    body: compressed as unknown as BodyInit,
   });
   if (!response.ok) {
     const responseJSON = await response.json().catch(() => null);
