@@ -1,5 +1,4 @@
 import history from "connect-history-api-fallback";
-import type { RequestHandler } from "express";
 import { Router } from "express";
 import serveStatic from "serve-static";
 
@@ -28,9 +27,7 @@ staticRouter.use(
   }),
 );
 
-staticRouter.use(
-  serveStatic(PUBLIC_PATH, longCacheOptions),
-);
+staticRouter.use(serveStatic(PUBLIC_PATH, longCacheOptions));
 
 staticRouter.use(
   serveStatic(CLIENT_DIST_PATH, {
