@@ -29,7 +29,16 @@ export const UserProfileContainer = () => {
   }, [isLoadingUser, user]);
 
   if (isLoadingUser) {
-    return null;
+    return (
+      <header className="relative">
+        <div className="bg-cax-surface-subtle h-32" />
+        <div className="border-cax-border bg-cax-surface-subtle absolute left-2/4 m-0 h-28 w-28 -translate-x-1/2 -translate-y-1/2 overflow-hidden rounded-full border sm:h-32 sm:w-32" />
+        <div className="px-4 pt-20">
+          <div className="bg-cax-surface-subtle mb-1 h-8 w-32 rounded" />
+          <div className="bg-cax-surface-subtle h-4 w-24 rounded" />
+        </div>
+      </header>
+    );
   }
 
   if (user === null) {

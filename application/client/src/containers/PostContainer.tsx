@@ -28,7 +28,26 @@ const PostContainerContent = ({ postId }: { postId: string | undefined }) => {
   }, [isLoadingPost, post]);
 
   if (isLoadingPost) {
-    return <div className="min-h-screen" />;
+    return (
+      <article className="px-1 sm:px-4">
+        <div className="border-cax-border border-b px-4 pt-4 pb-4">
+          <div className="flex items-center justify-center">
+            <div className="shrink-0 grow-0 pr-2">
+              <div className="bg-cax-surface-subtle h-14 w-14 rounded-full sm:h-16 sm:w-16" />
+            </div>
+            <div className="min-w-0 shrink grow">
+              <div className="bg-cax-surface-subtle mb-1 h-4 w-24 rounded" />
+              <div className="bg-cax-surface-subtle h-3 w-16 rounded" />
+            </div>
+          </div>
+          <div className="pt-2 sm:pt-4">
+            <div className="bg-cax-surface-subtle mb-2 h-6 w-full rounded" />
+            <div className="bg-cax-surface-subtle mb-2 h-6 w-3/4 rounded" />
+            <div className="bg-cax-surface-subtle h-6 w-1/2 rounded" />
+          </div>
+        </div>
+      </article>
+    );
   }
 
   if (post === null) {

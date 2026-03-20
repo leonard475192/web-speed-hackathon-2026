@@ -5,22 +5,24 @@
 - Current git status: !`git status`
 - Current git diff (staged and unstaged changes): !`git diff HEAD`
 - Current branch: !`git branch --show-current`
-- Current remotes: !`git remote -v`
+- Commits on branch: !`git log --oneline main..HEAD 2>/dev/null`
 
 ## Your task
 
-Based on the above changes:
+Context の情報だけで判断し、追加の確認コマンド（`git remote -v`, `gh auth status`, `git log` 等）は実行しない。即座に以下を実行する:
 
 1. main ブランチにいる場合は新しいフィーチャーブランチを作成する（`perf/`, `fix/`, `chore/`, `ci/` などのプレフィックスを使用）
-2. 変更内容に基づいて適切なコミットメッセージで単一のコミットを作成する
+2. 未コミットの変更がある場合のみ、適切なコミットメッセージで単一のコミットを作成する
 3. origin に push する
-4. `gh pr create` で PR を作成する。以下のルールを厳守:
-   - `--repo leonard475192/web-speed-hackathon-2026` を必ず指定する
-   - upstream（CyberAgentHack）には絶対に PR を作らない
-   - タイトルは70文字以内
-   - body は以下のテンプレートを使用:
+4. `unset GITHUB_TOKEN && gh auth switch --user leonard475192 2>&1` を実行してから `gh pr create` で PR を作成する
+
+ルール:
+- `--repo leonard475192/web-speed-hackathon-2026` を必ず指定する
+- upstream（CyberAgentHack）には絶対に PR を作らない
+- タイトルは70文字以内
 
 ```
+unset GITHUB_TOKEN && gh auth switch --user leonard475192 2>&1 && \
 gh pr create \
   --repo leonard475192/web-speed-hackathon-2026 \
   --base main \
