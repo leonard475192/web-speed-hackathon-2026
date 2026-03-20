@@ -53,20 +53,23 @@ const SearchPageComponent = ({
     }
 
     let isMounted = true;
-    analyzeSentiment(parsed.keywords)
-      .then((result) => {
-        if (isMounted) {
-          setIsNegative(result.label === "negative");
-        }
-      })
-      .catch(() => {
-        if (isMounted) {
-          setIsNegative(false);
-        }
-      });
+    const timerId = setTimeout(() => {
+      analyzeSentiment(parsed.keywords)
+        .then((result) => {
+          if (isMounted) {
+            setIsNegative(result.label === "negative");
+          }
+        })
+        .catch(() => {
+          if (isMounted) {
+            setIsNegative(false);
+          }
+        });
+    }, 300);
 
     return () => {
       isMounted = false;
+      clearTimeout(timerId);
     };
   }, [parsed.keywords]);
 
