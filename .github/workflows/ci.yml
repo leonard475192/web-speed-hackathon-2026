@@ -52,7 +52,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: client-dist
-          path: application/client/dist/
+          path: application/dist/
           retention-days: 1
 
   e2e:
@@ -71,7 +71,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: client-dist
-          path: application/client/dist/
+          path: application/dist/
       - run: cd application && pnpm --filter @web-speed-hackathon-2026/e2e exec playwright install --with-deps chromium
       - name: Start server and run E2E tests
         run: |
