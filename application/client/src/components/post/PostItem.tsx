@@ -25,6 +25,8 @@ export const PostItem = memo(function PostItem({ post }: Props) {
               <img
                 alt={post.user.profileImage.alt}
                 src={getProfileImagePath(post.user.profileImage.id)}
+                width={64}
+                height={64}
               />
             </Link>
           </div>
@@ -53,7 +55,7 @@ export const PostItem = memo(function PostItem({ post }: Props) {
           </div>
           {post.images?.length > 0 ? (
             <div className="relative mt-2 w-full">
-              <ImageArea images={post.images} />
+              <ImageArea images={post.images} isAboveFold={true} />
             </div>
           ) : null}
           {post.movie ? (
