@@ -63,7 +63,6 @@ const config = {
   },
   plugins: [
     new webpack.ProvidePlugin({
-      AudioContext: ["standardized-audio-context", "AudioContext"],
       Buffer: ["buffer", "Buffer"],
     }),
     new webpack.EnvironmentPlugin({
@@ -125,6 +124,15 @@ const config = {
     minimize: true,
     splitChunks: {
       chunks: "all",
+      maxSize: 200000,
+      cacheGroups: {
+        vendor: {
+          test: /[\\/]node_modules[\\/](react|react-dom|scheduler)[\\/]/,
+          name: "vendor-react",
+          chunks: "all",
+          priority: 20,
+        },
+      },
     },
     concatenateModules: true,
     usedExports: true,
