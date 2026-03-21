@@ -85,16 +85,33 @@ staticRouter.use(async (req, res, next) => {
 
   try {
     const { Post } = await import("@web-speed-hackathon-2026/server/src/models");
+    const { computeWaveform } =
+      await import("@web-speed-hackathon-2026/server/src/routes/api/sound");
 
     // For the home route, inline the first page of posts
     if (req.path === "/" || req.path === "/index.html") {
       const posts = await Post.findAll({
-        limit: 30,
+        limit: 10,
         offset: 0,
       });
 
       const postsJson = posts.map((p) => p.toJSON());
-      initialData["/api/v1/posts?limit=30&offset=0"] = postsJson;
+
+      for (const post of postsJson) {
+        const sound = (post as Record<string, unknown>)["sound"] as
+          | { id: string }
+          | null
+          | undefined;
+        if (sound) {
+          try {
+            (sound as Record<string, unknown>).waveform = await computeWaveform(sound.id);
+          } catch {
+            // skip if waveform computation fails
+          }
+        }
+      }
+
+      initialData["/api/v1/posts?limit=10&offset=0"] = postsJson;
 
       // Find the first post with images for LCP preload
       for (const post of postsJson) {
