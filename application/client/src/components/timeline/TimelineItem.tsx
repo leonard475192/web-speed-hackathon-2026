@@ -62,7 +62,7 @@ export const TimelineItem = memo(function TimelineItem({
             <img
               alt={post.user.profileImage.alt}
               className="h-full w-full object-cover"
-              src={getProfileImagePath(post.user.profileImage.id)}
+              src={getProfileImagePath(post.user.profileImage.id, 128)}
               loading={isProfileAboveFold ? "eager" : "lazy"}
               width={64}
               height={64}

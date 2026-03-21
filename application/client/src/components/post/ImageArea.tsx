@@ -27,9 +27,9 @@ export const ImageArea = ({ images, isAboveFold }: Props) => {
             >
               <CoveredImage
                 alt={image.alt}
-                src={getImagePath(image.id)}
-                loading={isAboveFold && idx === 0 ? "eager" : undefined}
-                fetchPriority={isAboveFold && idx === 0 ? "high" : undefined}
+                src={getImagePath(image.id, 686)}
+                loading={isAboveFold && idx === 0 ? "eager" : "lazy"}
+                fetchPriority={isAboveFold && idx === 0 ? "high" : "low"}
               />
             </div>
           );

@@ -36,7 +36,7 @@ export const UserProfileHeader = ({ user }: Props) => {
           width={128}
           height={128}
           onLoad={handleLoadImage}
-          src={getProfileImagePath(user.profileImage.id)}
+          src={getProfileImagePath(user.profileImage.id, 256)}
         />
       </div>
       <div className="px-4 pt-20">
