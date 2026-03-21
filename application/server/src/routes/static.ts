@@ -9,8 +9,12 @@ import {
   PUBLIC_PATH,
   UPLOAD_PATH,
 } from "@web-speed-hackathon-2026/server/src/paths";
+import { imageResizeMiddleware } from "@web-speed-hackathon-2026/server/src/routes/image-resize";
 
 export const staticRouter = Router();
+
+// Image resize middleware (before static serving)
+staticRouter.use(imageResizeMiddleware);
 
 // Serve uploaded files and public assets first
 staticRouter.use(
@@ -123,7 +127,7 @@ staticRouter.use(async (req, res, next) => {
         if (images && images.length > 0) {
           const firstImageId = images[0]!.id;
           preloadLinks.push(
-            `<link rel="preload" as="image" href="/images/${firstImageId}.webp" fetchpriority="high">`,
+            `<link rel="preload" as="image" href="/images/${firstImageId}.webp?w=686" fetchpriority="high">`,
           );
           break;
         }
