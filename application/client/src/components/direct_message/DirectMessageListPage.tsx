@@ -81,10 +81,8 @@ export const DirectMessageListPage = ({ activeUser, newDmModalId }: Props) => {
                 ? conversation.initiator
                 : conversation.member;
 
-            const lastMessage = messages.at(-1);
-            const hasUnread = messages
-              .filter((m) => m.sender.id === peer.id)
-              .some((m) => !m.isRead);
+            const lastMessage = messages[0];
+            const hasUnread = (conversation as any).hasUnread;
 
             return (
               <li className="grid" key={conversation.id}>
