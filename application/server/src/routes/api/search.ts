@@ -64,7 +64,7 @@ searchRouter.get("/search", async (req, res) => {
     where: whereConditions.length > 0 ? { [Op.and]: whereConditions } : {},
     limit,
     offset,
-    order: [["id", "DESC"]],
+    order: [["createdAt", "DESC"]],
     subQuery: false,
     raw: true,
   });
@@ -78,6 +78,9 @@ searchRouter.get("/search", async (req, res) => {
           where: { id: { [Op.in]: ids } },
         })
       : [];
+
+  // 元のコードと同じ createdAt DESC でソート
+  posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   res.setHeader("Cache-Control", "public, max-age=5");
   return res.status(200).type("application/json").send(posts);
