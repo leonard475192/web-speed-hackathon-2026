@@ -67,7 +67,7 @@ pnpm run seed:insert     # シード挿入
 
 ### Monorepo 構成 (pnpm workspaces)
 
-- `application/client/` — React 19 SPA (Webpack 5, Babel, Redux, React Router v7)
+- `application/client/` — React 19 SPA (Webpack 5, Babel, React Router v7)
 - `application/server/` — Express 5 API サーバー (Sequelize + SQLite, tsx で実行)
 - `application/e2e/` — Playwright VRT
 - `application/upload/` — ユーザーアップロードメディアの保存先
@@ -86,12 +86,11 @@ pnpm run seed:insert     # シード挿入
 
 ### Client
 
-- **エントリポイント**: `client/src/index.tsx` → Redux Provider + BrowserRouter
-- **ルーティング** (`containers/AppContainer.tsx`): `/`, `/posts/:postId`, `/dm`, `/dm/:conversationId`, `/search`, `/users/:username`, `/terms`, `/crok`
-- **状態管理**: Redux (redux-form のみ)。ほとんどのデータは React hooks でローカル管理
-- **ビルド**: Webpack 5。最適化は全て無効化済み（minimize, splitChunks, concatenateModules 等）→ ここが改善ポイント
-- **重い依存**: FFmpeg WASM, ImageMagick WASM, web-llm, kuromoji, jQuery, lodash, moment, bluebird, katex → バンドルサイズ最適化の主要ターゲット
-- **メディア変換**: クライアント側で FFmpeg/ImageMagick を使い画像・動画変換を実行
+- **エントリポイント**: `client/src/index.tsx` → BrowserRouter
+- **ルーティング** (`containers/AppContainer.tsx`): `/`, `/posts/:postId`, `/dm`, `/dm/:conversationId`, `/search`, `/users/:username`, `/terms`, `/crok`。全ページ `React.lazy` でcode-split済み
+- **状態管理**: React hooks でローカル管理（Redux は削除済み）
+- **ビルド**: Webpack 5。minimize, splitChunks, concatenateModules, usedExports, sideEffects 有効化済み。バンドル合計 約930KB
+- **残存する重い依存**: katex（数式レンダリング）
 
 ### Server
 
