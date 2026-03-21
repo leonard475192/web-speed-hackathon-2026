@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { memo, useCallback, useState } from "react";
 
 import { createTranslator } from "@web-speed-hackathon-2026/client/src/utils/create_translator";
 
@@ -11,7 +11,7 @@ interface Props {
   text: string;
 }
 
-export const TranslatableText = ({ text }: Props) => {
+export const TranslatableText = memo(function TranslatableText({ text }: Props) {
   const [state, updateState] = useState<State>({ type: "idle", text });
 
   const handleClick = useCallback(() => {
@@ -76,4 +76,4 @@ export const TranslatableText = ({ text }: Props) => {
       </p>
     </>
   );
-};
+});

@@ -5,7 +5,13 @@ interface ParsedData {
   peaks: number[];
 }
 
+const cache = new Map<string, ParsedData>();
+
 async function calculate(url: string): Promise<ParsedData> {
+  const cached = cache.get(url);
+  if (cached) {
+    return cached;
+  }
   const response = await fetch(url);
   const data = await response.arrayBuffer();
   const audioCtx = new AudioContext();
@@ -38,7 +44,9 @@ async function calculate(url: string): Promise<ParsedData> {
     if (mean > max) max = mean;
   }
 
-  return { max, peaks };
+  const result = { max, peaks };
+  cache.set(url, result);
+  return result;
 }
 
 interface Props {
