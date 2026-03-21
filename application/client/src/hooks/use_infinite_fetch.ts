@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-const LIMIT = 10;
+const LIMIT = 30;
 
 interface ReturnValues<T> {
   data: Array<T>;
