@@ -91,7 +91,7 @@ staticRouter.use(async (req, res, next) => {
     // For the home route, inline the first page of posts
     if (req.path === "/" || req.path === "/index.html") {
       const posts = await Post.findAll({
-        limit: 10,
+        limit: 30,
         offset: 0,
       });
 
@@ -104,14 +104,14 @@ staticRouter.use(async (req, res, next) => {
           | undefined;
         if (sound) {
           try {
-            (sound as Record<string, unknown>).waveform = await computeWaveform(sound.id);
+            (sound as Record<string, unknown>)["waveform"] = await computeWaveform(sound.id);
           } catch {
             // skip if waveform computation fails
           }
         }
       }
 
-      initialData["/api/v1/posts?limit=10&offset=0"] = postsJson;
+      initialData["/api/v1/posts?limit=30&offset=0"] = postsJson;
 
       // Find the first post with images for LCP preload
       for (const post of postsJson) {
