@@ -1,18 +1,11 @@
-import { memo } from "react";
-// @ts-expect-error -- dynamic CSS import for code splitting; no type declarations needed
-void import("katex/dist/katex.min.css");
-import Markdown from "react-markdown";
-import rehypeKatex from "rehype-katex";
-import remarkGfm from "remark-gfm";
-import remarkMath from "remark-math";
+import { Suspense, lazy, memo } from "react";
 
-import { CodeBlock } from "@web-speed-hackathon-2026/client/src/components/crok/CodeBlock";
 import { TypingIndicator } from "@web-speed-hackathon-2026/client/src/components/crok/TypingIndicator";
 import { CrokLogo } from "@web-speed-hackathon-2026/client/src/components/foundation/CrokLogo";
 
-const markdownComponents = { pre: CodeBlock };
-const rehypePluginsList = [rehypeKatex];
-const remarkPluginsList = [remarkMath, remarkGfm];
+const MarkdownRenderer = lazy(() =>
+  import("./MarkdownRenderer").then((m) => ({ default: m.MarkdownRenderer })),
+);
 
 interface Props {
   message: Models.ChatMessage;
@@ -42,13 +35,9 @@ const AssistantMessage = ({ content, isStreaming }: { content: string; isStreami
             isStreaming ? (
               <p className="whitespace-pre-wrap">{content}</p>
             ) : (
-              <Markdown
-                components={markdownComponents}
-                rehypePlugins={rehypePluginsList}
-                remarkPlugins={remarkPluginsList}
-              >
-                {content}
-              </Markdown>
+              <Suspense fallback={<p className="whitespace-pre-wrap">{content}</p>}>
+                <MarkdownRenderer content={content} />
+              </Suspense>
             )
           ) : (
             <TypingIndicator />

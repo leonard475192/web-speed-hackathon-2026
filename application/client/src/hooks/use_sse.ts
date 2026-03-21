@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { startTransition, useCallback, useRef, useState } from "react";
 
 interface SSEOptions<T> {
   onMessage: (data: T, prevContent: string) => string;
@@ -54,9 +54,14 @@ export function useSSE<T>(options: SSEOptions<T>): ReturnValues {
           if (rafId !== null) {
             cancelAnimationFrame(rafId);
           }
-          setContent(contentRef.current);
-          options.onComplete?.(contentRef.current);
-          stop();
+          const finalContent = contentRef.current;
+          eventSourceRef.current?.close();
+          eventSourceRef.current = null;
+          startTransition(() => {
+            setContent(finalContent);
+            setIsStreaming(false);
+          });
+          options.onComplete?.(finalContent);
           return;
         }
 
