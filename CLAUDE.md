@@ -101,6 +101,7 @@ pnpm run seed:insert     # シード挿入
 - **リアルタイム**: WebSocket (ws) で DM・タイピング通知、SSE で CROK AI チャット
 - **API**: `/api/v1/` 以下に REST エンドポイント群。主要ルートファイルは `server/src/routes/api/` 配下
 - **モデル**: User, Post, Image, Movie, Sound, Comment, ProfileImage, DirectMessage, DirectMessageConversation, QaSuggestion
+- **API ルート**: auth, initialize, image, movie, post, user, direct_message, sound, crok, search, sentiment, translate
 - **イベントバス**: `server/src/eventhub.ts` (Node EventEmitter) でリアルタイム機能を実装
 
 ### 採点ページ（9ページ表示 + 5シナリオ操作）
@@ -110,6 +111,7 @@ pnpm run seed:insert     # シード挿入
 
 ## Git & PRs
 
+- `gh` コマンド実行時は `GITHUB_TOKEN=` 環境変数を付与する
 - PRを作成する前に `git remote -v` と `gh repo view --json nameWithOwner` でリモートを確認し、ターゲットリポジトリをユーザーに確認する
 - origin = `leonard475192/web-speed-hackathon-2026`（フォーク）、upstream = `CyberAgentHack/web-speed-hackathon-2026`（本家）
 - PRは常に **origin（フォーク）** に対して作成する。upstream に PR を作らない
@@ -123,6 +125,11 @@ pnpm run seed:insert     # シード挿入
 - 修正が成功したと主張する前に、実際のテスト出力で検証する
 
 ## Development Notes
+
+### 並行開発
+
+- パフォーマンス改善は worktree を使い並行して実施する（`EnterWorktree` → agent 並列実行）
+- 1改善 = 1ブランチ = 1PR の粒度を保つ
 
 ### Docker / デプロイ制約
 
