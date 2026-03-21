@@ -56,7 +56,7 @@ export const imageResizeMiddleware: RequestHandler = async (req, res, next) => {
   try {
     const buffer = await sharp(sourceFile)
       .resize({ width, withoutEnlargement: true })
-      .webp({ quality: 80 })
+      .webp({ nearLossless: true, quality: 90 })
       .toBuffer();
 
     // Write to cache
