@@ -33,6 +33,8 @@ export const DirectMessageContainer = ({ activeUser, authModalId }: Props) => {
 
   const [isPeerTyping, setIsPeerTyping] = useState(false);
   const peerTypingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastTypingSentRef = useRef<number>(0);
+  const lastSentMessageIdRef = useRef<string | null>(null);
 
   const loadConversation = useCallback(async () => {
     if (activeUser == null) {
@@ -64,32 +66,54 @@ export const DirectMessageContainer = ({ activeUser, authModalId }: Props) => {
     async (params: DirectMessageFormData) => {
       setIsSubmitting(true);
       try {
-        await sendJSON(`/api/v1/dm/${conversationId}/messages`, {
-          body: params.body,
+        const sentMessage = await sendJSON<Models.DirectMessage>(
+          `/api/v1/dm/${conversationId}/messages`,
+          {
+            body: params.body,
+          },
+        );
+        lastSentMessageIdRef.current = sentMessage.id;
+        setConversation((prev) => {
+          if (prev == null) return prev;
+          return {
+            ...prev,
+            messages: [...prev.messages, sentMessage],
+          };
         });
-        loadConversation();
       } finally {
         setIsSubmitting(false);
       }
     },
-    [conversationId, loadConversation],
+    [conversationId],
   );
 
   const handleTyping = useCallback(async () => {
+    const now = Date.now();
+    if (now - lastTypingSentRef.current < 3000) {
+      return;
+    }
+    lastTypingSentRef.current = now;
     void sendJSON(`/api/v1/dm/${conversationId}/typing`, {});
   }, [conversationId]);
 
   useWs(`/api/v1/dm/${conversationId}`, (event: DmUpdateEvent | DmTypingEvent) => {
     if (event.type === "dm:conversation:message") {
-      void loadConversation().then(() => {
-        if (event.payload.sender.id !== activeUser?.id) {
-          setIsPeerTyping(false);
-          if (peerTypingTimeoutRef.current !== null) {
-            clearTimeout(peerTypingTimeoutRef.current);
-          }
-          peerTypingTimeoutRef.current = null;
+      if (
+        event.payload.sender.id === activeUser?.id &&
+        event.payload.id === lastSentMessageIdRef.current
+      ) {
+        // Already added optimistically
+        lastSentMessageIdRef.current = null;
+      } else {
+        void loadConversation();
+      }
+      if (event.payload.sender.id !== activeUser?.id) {
+        setIsPeerTyping(false);
+        if (peerTypingTimeoutRef.current !== null) {
+          clearTimeout(peerTypingTimeoutRef.current);
         }
-      });
+        peerTypingTimeoutRef.current = null;
+      }
       void sendRead();
     } else if (event.type === "dm:conversation:typing") {
       setIsPeerTyping(true);
