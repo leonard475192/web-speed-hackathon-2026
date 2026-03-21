@@ -51,12 +51,36 @@ searchRouter.get("/search", async (req, res) => {
     whereConditions.push(dateWhere);
   }
 
-  const posts = await Post.findAll({
+  // Phase 1: マッチするPost IDを正しいLIMIT/OFFSETで取得（images JOINなし）
+  const matchingRows = await Post.unscoped().findAll({
+    attributes: ["id"],
+    include: [
+      {
+        association: "user",
+        attributes: [],
+        required: false,
+      },
+    ],
+    where: whereConditions.length > 0 ? { [Op.and]: whereConditions } : {},
     limit,
     offset,
-    where: whereConditions.length > 0 ? { [Op.and]: whereConditions } : {},
+    order: [["createdAt", "DESC"]],
     subQuery: false,
+    raw: true,
   });
+
+  const ids = matchingRows.map((r: { id: string }) => r.id);
+
+  // Phase 2: IDリストでフルデータ取得（defaultScope適用）
+  const posts =
+    ids.length > 0
+      ? await Post.findAll({
+          where: { id: { [Op.in]: ids } },
+        })
+      : [];
+
+  // 元のコードと同じ createdAt DESC でソート
+  posts.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
 
   res.setHeader("Cache-Control", "public, max-age=5");
   return res.status(200).type("application/json").send(posts);
