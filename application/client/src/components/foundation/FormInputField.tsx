@@ -25,7 +25,7 @@ export const FormInputField = ({
 }: Props) => {
   const inputId = useId();
   const errorMessageId = useId();
-  const isInvalid = isTouched && error;
+  const isInvalid = !!error && isTouched;
 
   return (
     <div className="flex flex-col gap-y-1">

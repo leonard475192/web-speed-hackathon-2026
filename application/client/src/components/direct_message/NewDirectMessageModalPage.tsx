@@ -17,12 +17,12 @@ export const NewDirectMessageModalPage = ({ id, onSubmit }: Props) => {
     control,
     handleSubmit,
     setError,
-    formState: { errors, isSubmitting, isValid, touchedFields },
+    formState: { errors, isSubmitting, isValid, touchedFields, isSubmitted },
   } = useForm<NewDirectMessageFormData>({
     defaultValues: {
       username: "",
     },
-    mode: "onBlur",
+    mode: "onChange",
     resolver: (values) => {
       const validationErrors = validate(values);
       const fieldErrors: Record<string, { type: string; message: string }> = {};
@@ -59,7 +59,7 @@ export const NewDirectMessageModalPage = ({ id, onSubmit }: Props) => {
               leftItem={<span className="text-cax-text-subtle leading-none">@</span>}
               field={field}
               error={fieldState.error}
-              isTouched={touchedFields.username}
+              isTouched={touchedFields.username || isSubmitted}
             />
           )}
         />

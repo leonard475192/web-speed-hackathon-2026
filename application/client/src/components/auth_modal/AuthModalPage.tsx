@@ -19,7 +19,7 @@ export const AuthModalPage = ({ onRequestCloseModal, onSubmit }: Props) => {
     watch,
     setValue,
     setError,
-    formState: { errors, isSubmitting, isValid, touchedFields },
+    formState: { errors, isSubmitting, isValid, touchedFields, isSubmitted },
   } = useForm<AuthFormData>({
     defaultValues: {
       type: "signin",
@@ -27,7 +27,7 @@ export const AuthModalPage = ({ onRequestCloseModal, onSubmit }: Props) => {
       name: "",
       password: "",
     },
-    mode: "onBlur",
+    mode: "onChange",
     resolver: (values) => {
       const validationErrors = validate(values);
       const fieldErrors: Record<string, { type: string; message: string }> = {};
@@ -78,7 +78,7 @@ export const AuthModalPage = ({ onRequestCloseModal, onSubmit }: Props) => {
               autoComplete="username"
               field={field}
               error={fieldState.error}
-              isTouched={touchedFields.username}
+              isTouched={touchedFields.username || isSubmitted}
             />
           )}
         />
@@ -93,7 +93,7 @@ export const AuthModalPage = ({ onRequestCloseModal, onSubmit }: Props) => {
                 autoComplete="nickname"
                 field={field}
                 error={fieldState.error}
-                isTouched={touchedFields.name}
+                isTouched={touchedFields.name || isSubmitted}
               />
             )}
           />
@@ -109,7 +109,7 @@ export const AuthModalPage = ({ onRequestCloseModal, onSubmit }: Props) => {
               autoComplete={type === "signup" ? "new-password" : "current-password"}
               field={field}
               error={fieldState.error}
-              isTouched={touchedFields.password}
+              isTouched={touchedFields.password || isSubmitted}
             />
           )}
         />

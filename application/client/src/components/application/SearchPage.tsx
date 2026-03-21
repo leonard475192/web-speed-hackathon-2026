@@ -28,10 +28,10 @@ export const SearchPage = ({ query, results, defaultValues }: Props) => {
     handleSubmit,
     setError,
     reset,
-    formState: { errors, touchedFields },
+    formState: { errors, touchedFields, isSubmitted },
   } = useForm<SearchFormData>({
     defaultValues: defaultValues ?? { searchText: "" },
-    mode: "onBlur",
+    mode: "onChange",
     resolver: (values) => {
       const validationErrors = validate(values);
       const fieldErrors: Record<string, { type: string; message: string }> = {};
@@ -96,15 +96,6 @@ export const SearchPage = ({ query, results, defaultValues }: Props) => {
   }, [parsed]);
 
   const onSubmit = (values: SearchFormData) => {
-    const validationErrors = validate(values);
-    if (Object.keys(validationErrors).length > 0) {
-      for (const [key, message] of Object.entries(validationErrors)) {
-        if (message) {
-          setError(key as keyof SearchFormData, { message });
-        }
-      }
-      return;
-    }
     const sanitizedText = sanitizeSearchText(values.searchText.trim());
     navigate(`/search?q=${encodeURIComponent(sanitizedText)}`);
   };
@@ -118,14 +109,14 @@ export const SearchPage = ({ query, results, defaultValues }: Props) => {
               <input
                 {...register("searchText")}
                 className={`flex-1 rounded border px-4 py-2 focus:outline-none ${
-                  touchedFields.searchText && errors.searchText
+                  (touchedFields.searchText || isSubmitted) && errors.searchText
                     ? "border-cax-danger focus:border-cax-danger"
                     : "border-cax-border focus:border-cax-brand-strong"
                 }`}
                 placeholder="検索 (例: キーワード since:2025-01-01 until:2025-12-31)"
                 type="text"
               />
-              {touchedFields.searchText && errors.searchText && (
+              {(touchedFields.searchText || isSubmitted) && errors.searchText && (
                 <span className="text-cax-danger mt-1 text-xs">{errors.searchText.message}</span>
               )}
             </div>
