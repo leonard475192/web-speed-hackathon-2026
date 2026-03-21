@@ -44,11 +44,17 @@ export function useSSE<T>(options: SSEOptions<T>): ReturnValues {
       const eventSource = new EventSource(url);
       eventSourceRef.current = eventSource;
 
+      let rafId: number | null = null;
+
       eventSource.onmessage = (event) => {
         const data = JSON.parse(event.data) as T;
 
         const isDone = options.onDone?.(data) ?? false;
         if (isDone) {
+          if (rafId !== null) {
+            cancelAnimationFrame(rafId);
+          }
+          setContent(contentRef.current);
           options.onComplete?.(contentRef.current);
           stop();
           return;
@@ -56,11 +62,20 @@ export function useSSE<T>(options: SSEOptions<T>): ReturnValues {
 
         const newContent = options.onMessage(data, contentRef.current);
         contentRef.current = newContent;
-        setContent(newContent);
+
+        if (rafId === null) {
+          rafId = requestAnimationFrame(() => {
+            rafId = null;
+            setContent(contentRef.current);
+          });
+        }
       };
 
       eventSource.onerror = (error) => {
         console.error("SSE Error:", error);
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
         stop();
       };
     },

@@ -40,7 +40,6 @@ const AssistantMessage = ({ content }: { content: string }) => {
           {content ? (
             <Markdown
               components={markdownComponents}
-              key={content}
               rehypePlugins={rehypePluginsList}
               remarkPlugins={remarkPluginsList}
             >
